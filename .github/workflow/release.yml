@@ -1,0 +1,18 @@
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    tags: ['v*']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Package module
+        run: |
+          chmod 755 post-fs-data.sh service.sh
+          zip -r9 FCM_Guardian-${{ github.ref_name }}.zip \
+            module.prop post-fs-data.sh service.sh sepolicy.rule system/
+      - uses: softprops/action-gh-release@v4
+        with:
+          files: FCM_Guardian-${{ github.ref_name }}.zip
