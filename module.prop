@@ -3,4 +3,5 @@ name=FCM Guardian (Event-Driven)
 version=v1.2.0
 versionCode=120
 author=Mary
+updateJson=https://raw.githubusercontent.com/Marywanmary/FCM-Guardian/main/asset/update.json
 description=事件驱动型 GMS/FCM 守护。SQLite 双表注入锁定 240s 心跳，inotifyd 双监听防云控覆盖，路由事件触发多用户防火墙清理，30s 差量兜底捕获 Captive Portal VALIDATED 翻转。适配小米/OPPO/vivo/华为等国产 ROM。模块安装后位于 /data/adb/modules/fcm-guardian/，运行期动态文件在 /data/adb/fcm_guardian/（持久化，不随模块 OTA 丢失）
