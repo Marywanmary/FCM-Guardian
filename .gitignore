@@ -1,0 +1,19 @@
+# 打包产物
+*.zip
+dist/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+
+# 临时目录
+.gradle/
+.guardian/
+
+# IDE
+.vscode/
+.idea/
+*.swp
