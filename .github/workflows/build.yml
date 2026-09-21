@@ -1,0 +1,90 @@
+name: Build KernelSU Module
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------- 前置校验：文件名必须精确 ----------
+      - name: Validate module structure
+        run: |
+          set -e
+          test -f module.prop        || { echo "::error::缺少 module.prop（注意：不是 module.prop.txt）"; exit 1; }
+          test -f post-fs-data.sh    || { echo "::error::缺少 post-fs-data.sh"; exit 1; }
+          test -f service.sh         || { echo "::error::缺少 service.sh"; exit 1; }
+          test -f sepolicy.rule      || { echo "::error::缺少 sepolicy.rule（注意：不是 sepolicy.rule.txt）"; exit 1; }
+
+          # 校验 module.prop 必填字段
+          for key in id name version versionCode author description; do
+            grep -q "^${key}=" module.prop || { echo "::error::module.prop 缺少字段 ${key}"; exit 1; }
+          done
+
+          # 校验 id 命名规则：^[a-zA-Z][a-zA-Z0-9._-]+$
+          MODULE_ID=$(grep '^id=' module.prop | cut -d'=' -f2)
+          echo "$MODULE_ID" | grep -qE '^[a-zA-Z][a-zA-Z0-9._-]+$' || \
+            { echo "::error::module.prop 的 id 字段不合法: $MODULE_ID"; exit 1; }
+
+          # 校验脚本换行符为 LF（CRLF 会导致 shebang 解析失败）
+          file post-fs-data.sh service.sh | grep -q CRLF && \
+            { echo "::error::脚本包含 CRLF 换行，需转为 LF"; exit 1; } || true
+
+      # ---------- 赋予可执行权限（git 不保存 chmod 位） ----------
+      - name: Fix executable bits
+        run: chmod 755 post-fs-data.sh service.sh
+
+      - name: Extract module info
+        id: info
+        run: |
+          MODULE_ID=$(grep '^id=' module.prop | cut -d'=' -f2 | tr -d '\r\n')
+          MODULE_VERSION=$(grep '^version=' module.prop | cut -d'=' -f2 | tr -d '\r\n')
+          MODULE_VERCODE=$(grep '^versionCode=' module.prop | cut -d'=' -f2 | tr -d '\r\n')
+          echo "module_id=${MODULE_ID}" >> $GITHUB_OUTPUT
+          echo "module_version=${MODULE_VERSION}" >> $GITHUB_OUTPUT
+          echo "zip_name=${MODULE_ID}_${MODULE_VERSION}_${MODULE_VERCODE}.zip" >> $GITHUB_OUTPUT
+
+      # ---------- 打包：显式列出白名单文件（不用 zip -r .） ----------
+      - name: Pack module
+        run: |
+          ZIP_NAME="${{ steps.info.outputs.zip_name }}"
+          zip -r9 "${ZIP_NAME}" \
+            module.prop \
+            post-fs-data.sh \
+            service.sh \
+            sepolicy.rule \
+            system/ \
+            -x "*.DS_Store"
+
+          # 校验：zip 顶层不得包含目录（KernelSU 要求 module.prop 在根）
+          if unzip -l "${ZIP_NAME}" | awk 'NR>3 && $4 != "" {print $4}' | grep -qE '^[^/]+/$'; then
+            echo "::error::zip 顶层存在目录，KernelSU 将拒绝安装"
+            unzip -l "${ZIP_NAME}"
+            exit 1
+          fi
+
+          echo "ZIP_PATH=$(pwd)/${ZIP_NAME}" >> $GITHUB_ENV
+          echo "--- 打包内容 ---"
+          unzip -l "${ZIP_NAME}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.info.outputs.module_id }}-${{ steps.info.outputs.module_version }}
+          path: ${{ env.ZIP_PATH }}
+
+      - name: Create release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_PATH }}
+          generate_release_notes: true
