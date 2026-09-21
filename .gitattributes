@@ -1,3 +1,5 @@
-*.sh text eol=lf
-*.rule text eol=lf
-module.prop text eol=lf
+git mv module.prop.txt module.prop
+git mv sepolicy.rule.txt sepolicy.rule
+git mv .gitattributes.txt .gitattributes
+git mv .gitignore.txt .gitignore
+git add -A && git commit -m "fix: restore canonical filenames"
