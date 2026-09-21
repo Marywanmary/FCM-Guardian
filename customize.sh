@@ -3,8 +3,6 @@
 # FCM Guardian — customize.sh
 # 安装时执行：校验环境、准备目录、提示用户
 # ============================================================
-# 在刷入解压后，自动清理所有 sh 脚本中的 \r 字符
-find "$MODPATH" -type f -name "*.sh" -exec sed -i 's/\r$//' {} +
 
 SKIPMOUNT=false      # 是否需要挂载 system/ 目录（我们通过 post-fs-data 手动 bind mount，设为 false）
 PROPFILE=false       # 是否使用 system.prop 文件
