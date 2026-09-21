@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FCM Guardian — GMS/FCM/代理软件 电池与流量双白名单
+  放置路径: /system/etc/sysconfig/gms_proxy_whitelist.xml
+  allow-in-power-save       : 加入 Doze 白名单
+  allow-in-data-usage-save  : 加入流量节省白名单（国产 ROM 息屏断网主因）
+  allow-in-power-save-except-idle: 允许非 idle 时也活跃
+-->
+<config>
+
+    <!-- ========== GMS 核心家族 ========== -->
+    <allow-in-power-save package="com.google.android.gms" />
+    <allow-in-data-usage-save package="com.google.android.gms" />
+    <allow-in-power-save-except-idle package="com.google.android.gms" />
+
+    <allow-in-power-save package="com.google.android.gsf" />
+    <allow-in-data-usage-save package="com.google.android.gsf" />
+    <allow-in-power-save-except-idle package="com.google.android.gsf" />
+
+    <allow-in-power-save package="com.google.android.apps.gcs" />
+    <allow-in-data-usage-save package="com.google.android.apps.gcs" />
+
+    <allow-in-power-save package="com.google.android.gsf.login" />
+    <allow-in-data-usage-save package="com.google.android.gsf.login" />
+
+    <allow-in-power-save package="com.google.android.syncadapters.contacts" />
+    <allow-in-data-usage-save package="com.google.android.syncadapters.contacts" />
+
+    <allow-in-power-save package="com.google.android.syncadapters.calendar" />
+    <allow-in-data-usage-save package="com.google.android.syncadapters.calendar" />
+
+    <!-- ========== Play 商店 ========== -->
+    <allow-in-power-save package="com.android.vending" />
+    <allow-in-data-usage-save package="com.android.vending" />
+    <allow-in-power-save-except-idle package="com.android.vending" />
+
+    <!-- ========== 代理软件 ========== -->
+    <allow-in-power-save package="com.github.kr328.clash" />
+    <allow-in-data-usage-save package="com.github.kr328.clash" />
+    <allow-in-power-save-except-idle package="com.github.kr328.clash" />
+
+    <allow-in-power-save package="com.github.metacubex.clash.meta" />
+    <allow-in-data-usage-save package="com.github.metacubex.clash.meta" />
+
+    <allow-in-power-save package="moe.nb4a" />
+    <allow-in-data-usage-save package="moe.nb4a" />
+
+    <allow-in-power-save package="com.v2ray.ang" />
+    <allow-in-data-usage-save package="com.v2ray.ang" />
+
+    <allow-in-power-save package="io.nekohasekai.sfa" />
+    <allow-in-data-usage-save package="io.nekohasekai.sfa" />
+
+    <allow-in-power-save package="com.getsurfboard" />
+    <allow-in-data-usage-save package="com.getsurfboard" />
+
+    <!-- ========== 系统组件（GCM 路由依赖） ========== -->
+    <allow-in-power-save package="com.google.android.ext.services" />
+    <allow-in-power-save package="com.google.android.ext.shared" />
+    <allow-in-power-save package="com.google.android.configupdater" />
+    <allow-in-power-save package="com.google.android.partnersetup" />
+
+</config>

@@ -1,0 +1,40 @@
+# ============================================================
+# FCM Guardian — sepolicy.rule
+# 最小权限原则；每条对应具体系统调用
+# ============================================================
+
+# ---------- capability（仅 3 项必需） ----------
+# net_admin:   iptables / ip6tables / nft 规则操作
+# sys_admin:   mount -o bind sysconfig XML
+# dac_override: 读写 GSF 数据库 (uid=u0_aXX, mode=0600)
+allow su self:capability { net_admin sys_admin dac_override };
+
+# ---------- GSF 数据库读写（AOSP 标准 type） ----------
+allow su app_data_file:dir { search read write open getattr add_name remove_name };
+allow su app_data_file:file { read write open getattr };
+
+# ---------- 精确 exec type ----------
+allow su toolbox_exec:file { read execute execute_no_trans open getattr };
+allow su iptables_exec:file { read execute execute_no_trans open getattr };
+allow su ip6tables_exec:file { read execute execute_no_trans open getattr };
+allow su dumpstate_exec:file { read execute execute_no_trans open getattr };
+allow su am_exec:file { read execute execute_no_trans open getattr };
+allow su system_file:file { read open getattr };  # 只读，不 exec
+
+# ---------- 日志与工作目录（/data/local/tmp 与 /data/adb） ----------
+allow su system_data_file:dir { search read write open getattr add_name remove_name };
+allow su system_data_file:file { read write create open getattr setattr unlink };
+allow su adb_data_file:dir { search read write open getattr add_name remove_name };
+allow su adb_data_file:file { read write create open getattr setattr unlink };
+
+# ---------- 系统属性读取 ----------
+allow su default_prop:file { read open getattr };
+
+# ---------- rootfs 只读 ----------
+allow su rootfs:dir { search read open getattr };
+
+# ---------- am broadcast (IPC 到 system_server) ----------
+allow su system_server:binder { call transfer };
+
+# ---------- ip monitor route / dumpsys connectivity 需要 netlink ----------
+allow su self:netlink_route_socket { read write create bind getattr };

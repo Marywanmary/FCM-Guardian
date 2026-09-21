@@ -1,0 +1,18 @@
+FCM_Guardian/
+├── module.prop
+├── post-fs-data.sh
+├── service.sh
+├── sepolicy.rule
+├── system/
+│   └── etc/
+│       └── sysconfig/
+│           └── gms_proxy_whitelist.xml
+
+
+
+运行期动态文件（卸载时手动清理）：
+
+/data/adb/fcm_guardian/
+├── inject_gservices.sh        # SQLite 注入脚本
+├── on_db_changed.sh       # inotifyd 回调
+└── fcm_guardian.log → 软链到 /data/local/tmp/
